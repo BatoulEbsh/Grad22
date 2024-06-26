@@ -21,16 +21,24 @@ class OrderController extends Controller
     {
         $orders = Order::query()
             ->where('state', '=', 'waiting')
-            ->with(['user', 'products'])
+            ->with(['user' => function($query) {
+                $query->select(['id', 'name', 'email', 'phone', 'uId']);
+            }, 'products' => function($query) {
+                $query->select(['*']);
+            }])
             ->get();
 
-        if ($orders->isNotEmpty()) {
-            return $this->returnData('orders', $orders);
-        } else {
-            return $this->returnError(404, 'order not found');
-        }
+        $orders->each(function ($order) {
+            $order->products->each(function ($product) {
+                $product->amount = $product->pivot->amount;
+            });
+        });
 
+        return $this->returnData('orders', $orders);
+    
     }
+
+
 
     public function store(Request $request)
     {

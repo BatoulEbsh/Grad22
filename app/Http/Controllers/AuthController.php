@@ -29,30 +29,40 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
-
         $input = $request->all();
+
         $validator = Validator::make($input, [
-            'name' => 'required',
+            'name' => 'required|string',
             'email' => 'required|email|unique:users',
             'phone' => 'required|numeric',
             'password' => 'required|min:4',
             'c_password' => 'required|same:password',
-            'uId'=>'required|string'
+            'uId' => 'required|string'
         ]);
+
         if ($validator->fails()) {
             return $this->returnError(401, $validator->errors());
         }
 
         $input['password'] = Hash::make($input['password']);
-        $user = User::create($input);
+
+        $user = new User();
+        $user->name = $input['name'];
+        $user->email = $input['email'];
+        $user->phone = $input['phone'];
+        $user->password = $input['password'];
+        $user->uId = $input['uId'];
+
+        $user->save();
+
         $user->roles()->syncWithoutDetaching([3]);
+
         $token = JWTAuth::fromUser($user);
         $user['token'] = $token;
 
         return $this->returnData('token', $token, 'User registered successfully');
-
-
     }
+
 
     public function me()
     {
