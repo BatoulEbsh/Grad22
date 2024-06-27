@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProposedSystemController;
+use App\Http\Controllers\RecordController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\PreviousJobsController;
 use App\Http\Controllers\ProductController;
@@ -49,7 +50,7 @@ Route::group([
 ], function ($router) {
     Route::get('showAll', [TeamController::class, 'index']);
     Route::post('creatTeam', [TeamController::class, 'store'])->middleware('admin');
-    Route::post('getTeamDate/{id}',[TeamController::class,'getTeamDate']);
+    Route::post('getTeamDate/{id}', [TeamController::class, 'getTeamDate']);
 });
 Route::group([
     'middleware' => ['auth_user:api'],
@@ -94,13 +95,21 @@ Route::group([
 ], function ($router) {
     Route::get('showAll', [AppointmentController::class, 'index']);
     Route::post('store', [AppointmentController::class, 'store'])->middleware('admin');
+    Route::post('updateProducts/{id}', [AppointmentController::class, 'update']);
+    Route::post('done/{id}', [AppointmentController::class, 'done']);
+    Route::get('teamApp/{id}', [AppointmentController::class, 'teamApp']);
 });
 
-Route::get('types',[AppointmentController::class,'getType']);
-Route::get('statuses',[AppointmentController::class,'getStatus']);
+Route::group([
+    'middleware' => ['auth_user:api'],
+    'prefix' => 'records'
+], function ($router) {
+    Route::get('showAll', [RecordController::class, 'index']);
+    Route::get('showMyRecord', [RecordController::class, 'showMyRecord']);
+});
 
-
-
+Route::get('types', [AppointmentController::class, 'getType']);
+Route::get('statuses', [AppointmentController::class, 'getStatus']);
 
 
 Route::post('/store', [NotificationController::class, 'updateDeviceToken']);

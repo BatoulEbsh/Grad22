@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Record;
 use App\Models\User;
 use App\Traits\Helper;
 use App\Traits\ReturnResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Tymon\JWTAuth\Facades\JWTAuth;
@@ -59,7 +61,9 @@ class AuthController extends Controller
 
         $token = JWTAuth::fromUser($user);
         $user['token'] = $token;
-
+        $record = new Record();
+        $record->user_id = $user->id;
+        $record->save();
         return $this->returnData('token', $token, 'User registered successfully');
     }
 

@@ -32,4 +32,13 @@ class Order extends Model
     {
         return $this->belongsToMany(Product::class, 'order_products') ->withPivot('amount');
     }
+    public function records()
+    {
+        return $this->hasMany(Record::class,'order_id');
+    }
+    public function appointment()
+    {
+        return $this->hasOne(Appointment::class, 'order_id', 'id');
+    }
+
 }
