@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Appointment;
 use App\Models\Order;
 use App\Models\ProposedSystem;
+use App\Models\Record;
 use App\Models\Type;
 use App\Traits\Helper;
 use App\Traits\ReturnResponse;
@@ -21,9 +22,9 @@ class OrderController extends Controller
     {
         $orders = Order::query()
             ->where('state', '=', 'waiting')
-            ->with(['user' => function($query) {
+            ->with(['user' => function ($query) {
                 $query->select(['id', 'name', 'email', 'phone', 'uId']);
-            }, 'products' => function($query) {
+            }, 'products' => function ($query) {
                 $query->select(['*']);
             }])
             ->get();
@@ -35,9 +36,8 @@ class OrderController extends Controller
         });
 
         return $this->returnData('orders', $orders);
-    
-    }
 
+    }
 
 
     public function store(Request $request)
@@ -72,7 +72,10 @@ class OrderController extends Controller
                 'user_id' => Auth::id(),
             ]);
             $order->save();
+            $record = Record::firstOrNew(['user_id' => Auth::id()]);
 
+            $record->order_id = $order->id;
+            $record->save();
             return $this->returnSuccessMessage('order added successfully');
         } elseif ($input['type_id'] == 2) {
             $validator = Validator::make($input, [
@@ -100,6 +103,10 @@ class OrderController extends Controller
             }
             $order->products()->attach($productsWithAmount);
 
+            $record = Record::firstOrNew(['user_id' => Auth::id()]);
+
+            $record->order_id = $order->id;
+            $record->save();
             return $this->returnSuccessMessage('order added successfully');
         }
     }

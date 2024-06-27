@@ -14,4 +14,13 @@ class Appointment extends Model
         'user_id',
         'type_id',
         'status_id'];
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+    public function order()
+    {
+        return $this->belongsTo(Order::class, 'order_id', 'id');
+    }
+
 }
