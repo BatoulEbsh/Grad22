@@ -31,7 +31,8 @@ class ProposedSystemController extends Controller
             'name' => 'required|string|max:255',
             'desc' => 'nullable|string',
             'products' => 'required|array',
-            'products.*' => 'exists:products,id',
+            'products.*.id' => 'required|exists:products,id',
+            'products.*.amount' => 'required|numeric|between:0,99.99',
         ]);
 
         if ($validator->fails()) {
@@ -43,9 +44,14 @@ class ProposedSystemController extends Controller
             'desc' => $request->input('desc'),
         ]);
 
+        $productsWithAmounts = [];
+        foreach ($request->input('products') as $product) {
+            $productsWithAmounts[$product['id']] = ['amount' => $product['amount']];
+        }
 
-        $system->products()->attach($request->input('products'));
+        $system->products()->attach($productsWithAmounts);
 
         return $this->returnSuccessMessage('System added successfully');
     }
+
 }

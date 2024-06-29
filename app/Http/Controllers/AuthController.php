@@ -61,9 +61,6 @@ class AuthController extends Controller
 
         $token = JWTAuth::fromUser($user);
         $user['token'] = $token;
-        $record = new Record();
-        $record->user_id = $user->id;
-        $record->save();
         return $this->returnData('token', $token, 'User registered successfully');
     }
 

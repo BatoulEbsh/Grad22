@@ -72,11 +72,14 @@ class OrderController extends Controller
                 'user_id' => Auth::id(),
             ]);
             $order->save();
-            $record = Record::firstOrNew(['user_id' => Auth::id()]);
 
+
+            $record = new Record();
             $record->order_id = $order->id;
+            $record->user_id = Auth::id();
             $record->save();
-            return $this->returnSuccessMessage('order added successfully');
+
+            return $this->returnSuccessMessage('Order added successfully');
         } elseif ($input['type_id'] == 2) {
             $validator = Validator::make($input, [
                 'products' => 'required|array',
@@ -103,13 +106,16 @@ class OrderController extends Controller
             }
             $order->products()->attach($productsWithAmount);
 
-            $record = Record::firstOrNew(['user_id' => Auth::id()]);
 
+            $record = new Record();
             $record->order_id = $order->id;
+            $record->user_id = Auth::id();
             $record->save();
-            return $this->returnSuccessMessage('order added successfully');
+
+            return $this->returnSuccessMessage('Order added successfully');
         }
     }
+
 
     public function showAllMyOrder()
     {
