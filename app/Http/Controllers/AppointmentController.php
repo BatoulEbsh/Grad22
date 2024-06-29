@@ -130,6 +130,7 @@ class AppointmentController extends Controller
             $record->desc = $input['desc'];
             $record->save();
             $appointment->end_time = now();
+            $appointment->status_id=4;
             $appointment->save();
             $order->state = 'Done';
             $order->save();
@@ -142,6 +143,7 @@ class AppointmentController extends Controller
             ]);
         } elseif ($appointment->type_id == 2) {
             $appointment->end_time = now();
+            $appointment->status_id=4;
             $appointment->save();
             $order = Order::find($appointment->order_id);
             $order->state = 'Done';
