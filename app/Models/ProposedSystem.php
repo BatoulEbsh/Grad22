@@ -15,8 +15,11 @@ class ProposedSystem extends Model
             'desc'
         ];
 
+
     public function products()
     {
-        return $this->belongsToMany(Product::class, 'proposed_system_product');
+        return $this->belongsToMany(Product::class, 'proposed_system_product')
+            ->withPivot('amount');
     }
+
 }
