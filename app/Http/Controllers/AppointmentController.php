@@ -23,7 +23,7 @@ class AppointmentController extends Controller
         $appointment = Appointment::query()->select(['*'])
             ->with(['user' => function ($query) {
                     $query->select(['id', 'name', 'email', 'phone', 'uId']);
-                }]
+                },'order.products']
             )
             ->get();
 
@@ -63,16 +63,16 @@ class AppointmentController extends Controller
     public function update(Request $request, $appId)
     {
         $input = $request->all();
-        $appointment = Appointment::find($appId);
+        $appointment = Appointment::with('order.products')->find($appId);
 
         if (!$appointment) {
             return $this->returnError(404, 'Appointment not found');
         }
 
         $validator = Validator::make($input, [
-            'products' => 'required|array',
-            'products.*.id' => 'required|exists:products,id',
-            'products.*.amount' => 'required|numeric|between:0,99.99',
+            'products' => 'nullable|array',
+            'products.*.id' => 'required_with:products|exists:products,id',
+            'products.*.amount' => 'required_with:products|numeric|between:0,99.99',
         ]);
 
         if ($validator->fails()) {
@@ -85,24 +85,27 @@ class AppointmentController extends Controller
             return $this->returnError(404, 'Order not found');
         }
 
-
-        $products = [];
-        foreach ($input['products'] as $product) {
-            $products[$product['id']] = ['amount' => $product['amount']];
+        if (isset($input['products'])) {
+            $products = [];
+            foreach ($input['products'] as $product) {
+                $products[$product['id']] = ['amount' => $product['amount']];
+            }
+            $order->products()->sync($products);
         }
-
-        $order->products()->sync($products);
 
         $order->state = 'Execute';
         $order->save();
 
-        return $this->returnSuccessMessage('Order updated successfully');
+        $productsWithDetails = $order->products()->get();
+
+        return $this->returnData('Order updated successfully', ['products' => $productsWithDetails]);
     }
+
 
     public function teamApp($teamID)
     {
         $apps = Appointment::query()->where('team_id', '=', $teamID)
-            ->with('user')->get();
+            ->with(['user','order.products'])->get();
         return $this->returnData('Appointments:', $apps);
     }
 
@@ -124,9 +127,13 @@ class AppointmentController extends Controller
             $record = Record::find($appointment->order_id);
             $record->desc = $input['desc'];
             $record->save();
+            $appointment->end_time = now();
+            $appointment->save();
             $order->state = 'Done';
             $order->save();
         } elseif ($appointment->type_id == 2) {
+            $appointment->end_time = now();
+            $appointment->save();
             $order = Order::find($appointment->order_id);
             $order->state = 'Done';
             $order->save();
@@ -134,7 +141,7 @@ class AppointmentController extends Controller
 
         return $this->returnSuccessMessage('Order updated successfully');
     }
-    
+
     public function getType()
     {
         $type = Type::all();

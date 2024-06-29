@@ -21,7 +21,9 @@ class RecordController extends Controller
             ->with(['user:id,name,email,phone,uId', 'order', 'appointment'])
             ->where(function ($query) {
                 $query->where('o.state', 'waiting')
-                    ->orWhere('o.state', 'Detect');
+                    ->orWhere('o.state', 'Detect')
+                    ->orWhere('o.state', 'Execute')
+                    ->orWhere('o.state', 'Done');
             })
             ->get();
 
@@ -39,7 +41,9 @@ class RecordController extends Controller
             ->with(['user:id,name,email,phone,uId', 'order', 'appointment'])
             ->where(function ($query) {
                 $query->where('o.state', 'waiting')
-                    ->orWhere('o.state', 'Detect');
+                    ->orWhere('o.state', 'Detect')
+                    ->orWhere('o.state', 'Execute')
+                    ->orWhere('o.state', 'Done');
             })
             ->get();
 
