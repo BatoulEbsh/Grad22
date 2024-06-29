@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Invoices extends Model
@@ -11,6 +12,12 @@ class Invoices extends Model
     protected $fillable = [
         'totalPrice',
         'date',
-        'order_id'
+        'order_id',
+        'otherPrice'
     ];
+
+    public function order()
+    {
+        return $this->belongsTo(Order::class, 'order_id');
+    }
 }

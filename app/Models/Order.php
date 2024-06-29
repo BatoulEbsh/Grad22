@@ -40,5 +40,10 @@ class Order extends Model
     {
         return $this->hasOne(Appointment::class, 'order_id', 'id');
     }
+    public function invoices()
+    {
+        return $this->hasMany(Invoices::class);
+    }
+
 
 }

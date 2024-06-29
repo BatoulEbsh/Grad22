@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\InvoicesController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProposedSystemController;
@@ -107,6 +108,15 @@ Route::group([
     Route::get('showAll', [RecordController::class, 'index']);
     Route::get('showMyRecord', [RecordController::class, 'showMyRecord']);
 });
+Route::group([
+    'middleware' => ['auth_user:api'],
+    'prefix' => 'invoices'
+], function ($router) {
+    Route::post('store', [InvoicesController::class, 'store'])->middleware('admin');
+    Route::get('show/{id}', [InvoicesController::class, 'show'])->middleware('admin');
+    Route::get('showAll', [InvoicesController::class, 'index'])->middleware('admin');
+    
+});
 
 Route::get('types', [AppointmentController::class, 'getType']);
 Route::get('statuses', [AppointmentController::class, 'getStatus']);
@@ -114,3 +124,5 @@ Route::get('statuses', [AppointmentController::class, 'getStatus']);
 
 Route::post('/store', [NotificationController::class, 'updateDeviceToken']);
 Route::post('/send', [NotificationController::class, 'sendNotification']);
+
+

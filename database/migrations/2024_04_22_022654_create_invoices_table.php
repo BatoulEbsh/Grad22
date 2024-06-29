@@ -11,6 +11,7 @@ return new class extends Migration {
             $table->id();
             $table->double('totalPrice');
             $table->date('date');
+            $table->double('otherPrice');
             $table->foreignId('order_id')->references('id')->on('orders')->onDelete('cascade');
             $table->timestamps();
         });

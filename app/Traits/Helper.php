@@ -3,6 +3,7 @@ namespace App\Traits;
 
 
 use App\Models\Image;
+use App\Models\Order;
 use Illuminate\Support\Facades\Broadcast;
 trait Helper
 {
@@ -26,6 +27,14 @@ trait Helper
             $data->save();
         }
     }
-
+    public function calculateTotalPrice($orderId)
+    {
+        $order = Order::find($orderId);
+        $total = 0;
+        foreach ($order->products as $product) {
+            $total += $product->pivot->amount * $product->price;
+        }
+        return $total;
+    }
 
 }
